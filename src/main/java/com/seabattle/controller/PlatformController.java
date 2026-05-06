@@ -12,6 +12,7 @@ import com.seabattle.service.BotStrategyService;
 import com.seabattle.service.LeaderboardService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/api")
@@ -73,6 +74,14 @@ public class PlatformController {
     public GameEngine.SessionView joinGame(@RequestBody JoinGameRequest request) {
         var session = gameEngine.joinSession(request.inviteCode(), request.nickname());
         return session.asView();
+    }
+
+    @GetMapping("/location")
+    public Map<String, String> getLocation() {
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> response = restTemplate.getForObject("https://ipapi.co/json/", Map.class);
+
+        return Map.of("city", response != null ? (String) response.get("city") : "Unknown");
     }
 
     public record ResultRequest(String nickname, String city, boolean won, int shotsFired, int hits) {}
