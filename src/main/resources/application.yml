@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/seabattle
+    username: admin
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+app:
+  gemini:
+    api-key: ${APP_GEMINI_API_KEY:}
+    model: gemini-1.5-flash
+  ipapi:
+    base-url: http://ip-api.com/json/
