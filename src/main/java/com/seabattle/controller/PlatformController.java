@@ -30,13 +30,6 @@ public class PlatformController {
         this.gameEngine = gameEngine;
     }
 
-    @GetMapping("/location")
-    public Map<String, String> location(HttpServletRequest request,
-                                        @RequestHeader(value = "X-Forwarded-For", required = false) String forwardedFor) {
-        String ip = forwardedFor != null ? forwardedFor.split(",")[0].trim() : request.getRemoteAddr();
-        return Map.of("city", leaderboardService.detectCity(ip));
-    }
-
     @PostMapping("/stats/result")
     public PlayerStat upsert(@RequestBody ResultRequest request) {
         return leaderboardService.upsertResult(
