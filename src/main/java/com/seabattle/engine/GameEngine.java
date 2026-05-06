@@ -16,8 +16,11 @@ public class GameEngine {
     private final Map<String, GameSession> sessions = new ConcurrentHashMap<>();
 
     public GameSession createSession(String hostNickname) {
+        if (hostNickname == null || hostNickname.isBlank()) {
+            throw new IllegalArgumentException("Nickname is required");
+        }
         String inviteCode = UUID.randomUUID().toString().substring(0, 8);
-        GameSession session = new GameSession(inviteCode, hostNickname);
+        GameSession session = new GameSession(inviteCode, hostNickname.trim());
         sessions.put(inviteCode, session);
         return session;
     }
@@ -29,7 +32,10 @@ public class GameEngine {
     public GameSession joinSession(String inviteCode, String nickname) {
         GameSession session = sessions.get(inviteCode);
         if (session == null) throw new IllegalArgumentException("Session not found");
-        session.join(nickname);
+        if (nickname == null || nickname.isBlank()) {
+            throw new IllegalArgumentException("Nickname is required");
+        }
+        session.join(nickname.trim());
         return session;
     }
 
@@ -57,7 +63,8 @@ public class GameEngine {
         public int length() { return length; }
     }
 
-    public record ShotOutcome(boolean hit, boolean sunk, boolean win, String nextTurn, String message) {}
+    public record ShotOutcome(String shooter, int x, int y, boolean hit, boolean sunk, boolean win, String nextTurn, String message) {}
+    public record SessionView(String inviteCode, String host, String guest, String turn, boolean started, boolean hostPlaced, boolean guestPlaced) {}
 
     public static class GameSession {
         private final String inviteCode;
@@ -76,6 +83,9 @@ public class GameEngine {
 
         void join(String nickname) {
             if (guest != null) throw new IllegalStateException("Room already full");
+            if (host.equalsIgnoreCase(nickname)) {
+                throw new IllegalArgumentException("Guest nickname must be different from host nickname");
+            }
             guest = nickname;
             boards.put(nickname, new Board());
         }
@@ -98,7 +108,7 @@ public class GameEngine {
                 turn = opponent;
             }
             boolean win = enemyBoard.allShipsSunk();
-            return new ShotOutcome(result.hit(), result.sunk(), win, turn, result.message());
+            return new ShotOutcome(nickname, x, y, result.hit(), result.sunk(), win, turn, result.message());
         }
 
         private String opponentOf(String nickname) {
@@ -118,6 +128,11 @@ public class GameEngine {
         public String guest() { return guest; }
         public String turn() { return turn; }
         public boolean started() { return started; }
+        public boolean hostPlaced() { return boards.get(host).isPlaced(); }
+        public boolean guestPlaced() { return guest != null && boards.get(guest).isPlaced(); }
+        public SessionView asView() {
+            return new SessionView(inviteCode, host, guest, turn, started, hostPlaced(), guestPlaced());
+        }
     }
 
     record ShotResult(boolean hit, boolean sunk, String message) {}

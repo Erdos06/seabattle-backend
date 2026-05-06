@@ -70,15 +70,15 @@ public class PlatformController {
     }
 
     @PostMapping("/games/create")
-    public Map<String, String> createGame(@RequestBody CreateGameRequest request) {
+    public GameEngine.SessionView createGame(@RequestBody CreateGameRequest request) {
         var session = gameEngine.createSession(request.nickname());
-        return Map.of("inviteCode", session.inviteCode(), "host", session.host());
+        return session.asView();
     }
 
     @PostMapping("/games/join")
-    public Map<String, String> joinGame(@RequestBody JoinGameRequest request) {
+    public GameEngine.SessionView joinGame(@RequestBody JoinGameRequest request) {
         var session = gameEngine.joinSession(request.inviteCode(), request.nickname());
-        return Map.of("inviteCode", session.inviteCode(), "guest", session.guest());
+        return session.asView();
     }
 
     public record ResultRequest(String nickname, String city, boolean won, int shotsFired, int hits) {}

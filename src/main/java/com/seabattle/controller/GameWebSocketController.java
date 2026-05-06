@@ -23,30 +23,49 @@ public class GameWebSocketController {
 
     @MessageMapping("/game.create")
     public void create(CreateGameRequest request) {
-        var session = gameEngine.createSession(request.nickname());
-        messagingTemplate.convertAndSend("/topic/game/" + session.inviteCode(),
-                new GameEvent("GAME_CREATED", session));
+        try {
+            var session = gameEngine.createSession(request.nickname());
+            messagingTemplate.convertAndSend("/topic/game/" + session.inviteCode(),
+                    new GameEvent("GAME_CREATED", session.asView()));
+        } catch (Exception ex) {
+            messagingTemplate.convertAndSend("/queue/errors", new GameEvent("ERROR", ex.getMessage()));
+        }
     }
 
     @MessageMapping("/game.join")
     public void join(JoinGameRequest request) {
-        var session = gameEngine.joinSession(request.inviteCode(), request.nickname());
-        messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
-                new GameEvent("PLAYER_JOINED", session));
+        try {
+            var session = gameEngine.joinSession(request.inviteCode(), request.nickname());
+            messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
+                    new GameEvent("PLAYER_JOINED", session.asView()));
+        } catch (Exception ex) {
+            messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
+                    new GameEvent("ERROR", ex.getMessage()));
+        }
     }
 
     @MessageMapping("/game.place")
     public void place(PlaceShipsRequest request) {
-        gameEngine.placeShips(request.inviteCode(), request.nickname(), request.ships());
-        var session = gameEngine.getSession(request.inviteCode());
-        messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
-                new GameEvent("SHIPS_PLACED", session));
+        try {
+            gameEngine.placeShips(request.inviteCode(), request.nickname(), request.ships());
+            var session = gameEngine.getSession(request.inviteCode());
+            messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
+                    new GameEvent("SHIPS_PLACED", session.asView()));
+        } catch (Exception ex) {
+            messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
+                    new GameEvent("ERROR", ex.getMessage()));
+        }
     }
 
     @MessageMapping("/game.shoot")
     public void shoot(ShootRequest request) {
-        var outcome = gameEngine.shoot(request.inviteCode(), request.nickname(), request.x(), request.y());
-        messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
-                new GameEvent("SHOT_RESULT", outcome));
+        try {
+            var outcome = gameEngine.shoot(request.inviteCode(), request.nickname(), request.x(), request.y());
+            messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
+                    new GameEvent("SHOT_RESULT", outcome));
+        } catch (Exception ex) {
+            messagingTemplate.convertAndSend("/topic/game/" + request.inviteCode(),
+                    new GameEvent("ERROR", ex.getMessage()));
+        }
     }
 }
