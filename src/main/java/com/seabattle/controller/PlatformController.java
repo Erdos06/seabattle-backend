@@ -3,13 +3,7 @@ package com.seabattle.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.seabattle.model.PlayerStat;
 import com.seabattle.engine.GameEngine;
@@ -21,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "https://seabattle-frontend.vercel.app/")
 public class PlatformController {
     private final LeaderboardService leaderboardService;
     private final AiCoachService aiCoachService;
