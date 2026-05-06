@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "https://seabattle-frontend.vercel.app/")
 public class PlatformController {
     private final LeaderboardService leaderboardService;
     private final AiCoachService aiCoachService;

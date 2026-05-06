@@ -13,7 +13,6 @@ import com.seabattle.engine.GameEngine;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Controller
-@CrossOrigin(origins = "https://seabattle-frontend.vercel.app/")
 public class GameWebSocketController {
     private final GameEngine gameEngine;
     private final SimpMessagingTemplate messagingTemplate;

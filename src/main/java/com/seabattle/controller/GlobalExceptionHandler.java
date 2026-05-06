@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-@CrossOrigin(origins = "https://seabattle-frontend.vercel.app/")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
